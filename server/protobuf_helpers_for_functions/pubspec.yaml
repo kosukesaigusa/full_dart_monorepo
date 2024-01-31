@@ -1,0 +1,12 @@
+name: protobuf_helpers_for_functions
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+
+environment:
+  sdk: ^3.2.6
+
+dependencies:
+  protobuf: ^3.1.0
+
+dev_dependencies:
+  test: ^1.24.0

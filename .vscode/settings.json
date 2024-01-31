@@ -9,5 +9,12 @@
     "**/.fvm": true
   },
   "dart.runPubGetOnPubspecChanges": "never",
-  "cSpell.words": ["momorepo"]
+  "cSpell.words": [
+    "combinators",
+    "momorepo",
+    "pbenum",
+    "protobuf",
+    "struct",
+    "todos"
+  ]
 }
