@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug client app",
+      "program": "client/full_dart_client/lib/main.dart",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--debug",
+        "-d",
+        "chrome"
+      ]
+    },
+    {
+      "name": "Debug oncreateuser",
+      "request": "launch",
+      "program": "server/full_dart_server/bin/server.dart",
+      "type": "dart",
+      "args": [
+        "--target=oncreatetodo",
+        "--signature-type=cloudevent"
+      ],
+      "env": {
+        "ENVIRONMENT": "",
+        "CLIENT_ID": "",
+        "CLIENT_EMAIL": "",
+        "PRIVATE_KEY": ""
+      }
+    }
+  ]
+}
