@@ -21,8 +21,8 @@ Future<void> main(List<String> args) async {
 }
 
 FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
-      'oncreateuser' => FunctionTarget.cloudEventWithContext(
-          function_library.oncreateuser,
+      'oncreatetodo' => FunctionTarget.cloudEventWithContext(
+          function_library.oncreatetodo,
         ),
       _ => null
     };
