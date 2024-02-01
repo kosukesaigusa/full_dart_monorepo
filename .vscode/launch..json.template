@@ -13,7 +13,7 @@
       ]
     },
     {
-      "name": "Debug oncreateuser",
+      "name": "Debug oncreatetodo",
       "request": "launch",
       "program": "server/full_dart_server/bin/server.dart",
       "type": "dart",
