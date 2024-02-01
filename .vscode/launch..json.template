@@ -22,7 +22,8 @@
         "--signature-type=cloudevent"
       ],
       "env": {
-        "ENVIRONMENT": "",
+        "ENVIRONMENT": "local",
+        "PROJECT_ID": "",
         "CLIENT_ID": "",
         "CLIENT_EMAIL": "",
         "PRIVATE_KEY": ""
