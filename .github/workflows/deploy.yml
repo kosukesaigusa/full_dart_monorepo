@@ -1,0 +1,55 @@
+name: Deploy to Cloud Run from Source
+
+on:
+  push:
+    branches:
+      - main
+env:
+  SERVICE: oncreatetodo
+  REGION: asia-northeast1
+
+jobs:
+  deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+
+      - name: Set up Dart
+        uses: 'dart-lang/setup-dart@v1'
+        with:
+          sdk: stable
+
+      # NOTE: Alternative option - authentication via credentials json
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          # credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+          project_id: '${{ secrets.PROJECT_ID }}'
+          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
+
+      - name: Build
+        run: |
+          dart pub get
+          dart pub run build_runner build --delete-conflicting-outputs
+        working-directory: server/full_dart_server
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          source: ./
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          env_vars: ENVIRONMENT=production
+          secrets: |
+            PROJECT_ID=PROJECT_ID:latest
+            CLIENT_ID=CLIENT_ID:latest
+            CLIENT_EMAIL=CLIENT_EMAIL:latest
+            PRIVATE_KEY=PRIVATE_KEY:latest
