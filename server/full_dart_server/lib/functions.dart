@@ -9,6 +9,7 @@ import 'utils/parser.dart';
 
 @CloudFunction()
 Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
+  context.logger.debug('oncreatetodo function is triggered');
   final documentEventData =
       DocumentEventData.fromBuffer(event.data! as List<int>);
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
@@ -38,6 +39,7 @@ Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
 
 @CloudFunction()
 Future<void> onupdatetodo(CloudEvent event, RequestContext context) async {
+  context.logger.debug('onupdatetodo function is triggered');
   final documentEventData =
       DocumentEventData.fromBuffer(event.data! as List<int>);
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
@@ -58,6 +60,7 @@ Future<void> onupdatetodo(CloudEvent event, RequestContext context) async {
 
 @CloudFunction()
 Future<void> ondeletetodo(CloudEvent event, RequestContext context) async {
+  context.logger.debug('ondeletetodo function is triggered');
   final documentEventData =
       DocumentEventData.fromBuffer(event.data! as List<int>);
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
@@ -78,6 +81,7 @@ Future<void> ondeletetodo(CloudEvent event, RequestContext context) async {
 
 @CloudFunction()
 Future<void> onwritetodo(CloudEvent event, RequestContext context) async {
+  context.logger.debug('onwritetodo function is triggered');
   final documentEventData =
       DocumentEventData.fromBuffer(event.data! as List<int>);
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
