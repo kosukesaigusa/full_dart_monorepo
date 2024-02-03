@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run from Source
+name: 🚚 Deploy to Cloud Run
 
 on:
   workflow_dispatch:
