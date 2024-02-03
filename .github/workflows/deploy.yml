@@ -84,8 +84,9 @@ jobs:
             PRIVATE_KEY=PRIVATE_KEY:latest
 
       - name: Create Eventarc Trigger
+        if: ${{ matrix.signature_type == 'cloudevent' }}
         run: |
-          if ! gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }}; then
+          if ! gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }} > /dev/null 2>&1; then
             echo "Trigger does not exist. Creating trigger."
             gcloud eventarc triggers create ${{ matrix.service }} \
               --location=${{ env.REGION }} \
