@@ -20,20 +20,19 @@ final todoQueryProvider = AutoDisposeProvider<TodoQuery>.internal(
 );
 
 typedef TodoQueryRef = AutoDisposeProviderRef<TodoQuery>;
-String _$todoListHash() => r'7e71fca1db0730983b28290b2737ef974a2e571e';
+String _$todosHash() => r'faae4309417da5c8e17d8e20451249704bd6e009';
 
-/// See also [TodoList].
-@ProviderFor(TodoList)
-final todoListProvider =
-    AutoDisposeAsyncNotifierProvider<TodoList, List<Todo>>.internal(
-  TodoList.new,
-  name: r'todoListProvider',
+/// See also [todos].
+@ProviderFor(todos)
+final todosProvider = AutoDisposeStreamProvider<List<Todo>>.internal(
+  todos,
+  name: r'todosProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$todoListHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$todosHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$TodoList = AutoDisposeAsyncNotifier<List<Todo>>;
+typedef TodosRef = AutoDisposeStreamProviderRef<List<Todo>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

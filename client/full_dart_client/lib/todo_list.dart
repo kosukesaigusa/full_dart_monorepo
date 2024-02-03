@@ -1,5 +1,8 @@
-import 'package:firestore_document_models/firestore_document_models.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'todo.dart';
 
 part 'todo_list.g.dart';
 
@@ -7,59 +10,122 @@ part 'todo_list.g.dart';
 TodoQuery todoQuery(TodoQueryRef _) => TodoQuery();
 
 @riverpod
-class TodoList extends _$TodoList {
+Stream<List<Todo>> todos(TodosRef ref) =>
+    ref.watch(todoQueryProvider).subscribeDocuments();
+
+class TodoListPage extends ConsumerStatefulWidget {
+  const TodoListPage({super.key});
+
   @override
-  Future<List<Todo>> build() => ref.watch(todoQueryProvider).fetchDocuments();
+  ConsumerState<TodoListPage> createState() => _TodoListPageState();
+}
 
-  Future<void> addTodo(String title) async {
-    await ref
-        .read(todoQueryProvider)
-        .add(createTodoData: CreateTodoData(title: title));
-    ref.invalidateSelf();
-  }
-
-  Future<void> updateCompletionStatus({
-    required String todoId,
-    required bool isCompleted,
-  }) async {
-    await ref.read(todoQueryProvider).update(
-          todoId: todoId,
-          updateTodoData: UpdateTodoData(isCompleted: isCompleted),
-        );
-    ref.invalidateSelf();
-  }
-
-  Future<void> delete(String todoId) async {
-    await ref.read(todoQueryProvider).delete(todoId: todoId);
-    ref.invalidateSelf();
-  }
-
-  Future<void> completeAll() async {
-    final todoIds =
-        (await ref.read(todoListProvider.future)).map((todo) => todo.todoId);
-    await ref.read(todoQueryProvider).batchWrite(
-          todoIds
-              .map(
-                (todoId) => BatchUpdateTodo(
-                  todoId: todoId,
-                  updateTodoData: const UpdateTodoData(isCompleted: true),
+class _TodoListPageState extends ConsumerState<TodoListPage> {
+  @override
+  Widget build(BuildContext context) {
+    final todos = ref.watch(todosProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Todo List')),
+      body: todos.when(
+        data: (todos) => RefreshIndicator(
+          onRefresh: () => ref.refresh(todosProvider.future),
+          child: ListView.builder(
+            itemCount: todos.length,
+            itemBuilder: (context, index) {
+              final todo = todos[index];
+              return ListTile(
+                key: ValueKey(todo.todoId),
+                title: Text(todo.title),
+                subtitle: Text(todo.todoId),
+                leading: Checkbox(
+                  value: todo.isCompleted,
+                  onChanged: (value) async {
+                    if (value == null) {
+                      return;
+                    }
+                    await ref.read(todoQueryProvider).update(
+                          todoId: todo.todoId,
+                          updateTodoData: UpdateTodoData(isCompleted: value),
+                        );
+                  },
                 ),
-              )
-              .toList(),
-        );
-    ref.invalidateSelf();
+                trailing: IconButton(
+                  onPressed: () =>
+                      ref.read(todoQueryProvider).delete(todoId: todo.todoId),
+                  icon: const Icon(Icons.delete),
+                ),
+              );
+            },
+          ),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text(err.toString())),
+      ),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              final todoIds = (await ref.read(todosProvider.future))
+                  .map((todo) => todo.todoId);
+              await ref.read(todoQueryProvider).batchWrite(
+                    todoIds
+                        .map(
+                          (todoId) => BatchUpdateTodo(
+                            todoId: todoId,
+                            updateTodoData:
+                                const UpdateTodoData(isCompleted: true),
+                          ),
+                        )
+                        .toList(),
+                  );
+            },
+            child: const Icon(Icons.check),
+          ),
+          const SizedBox(height: 4),
+          FloatingActionButton(
+            onPressed: () async {
+              final todoIds = (await ref.read(todosProvider.future))
+                  .map((todo) => todo.todoId);
+              await ref.read(todoQueryProvider).batchWrite(
+                    todoIds
+                        .map((todoId) => BatchDeleteTodo(todoId: todoId))
+                        .toList(),
+                  );
+            },
+            child: const Icon(Icons.delete),
+          ),
+          const SizedBox(height: 4),
+          FloatingActionButton(
+            onPressed: () async {
+              final count = await ref.read(todoQueryProvider).count(
+                    queryBuilder: (query) =>
+                        query.where('isCompleted', isNotEqualTo: true),
+                  );
+              if (count == null) {
+                return;
+              }
+              if (!mounted) {
+                return;
+              }
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(content: Text('$count todos left.')),
+                );
+            },
+            child: const Icon(Icons.onetwothree),
+          ),
+          const SizedBox(height: 4),
+          FloatingActionButton(
+            onPressed: () => ref.read(todoQueryProvider).add(
+                  createTodoData:
+                      CreateTodoData(title: 'Todo ${DateTime.now()}'),
+                ),
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
   }
-
-  Future<void> deleteAll() async {
-    final todoIds =
-        (await ref.read(todoListProvider.future)).map((todo) => todo.todoId);
-    await ref.read(todoQueryProvider).batchWrite(
-          todoIds.map((todoId) => BatchDeleteTodo(todoId: todoId)).toList(),
-        );
-    ref.invalidateSelf();
-  }
-
-  Future<int?> countNotCompletedTodos() => ref.read(todoQueryProvider).count(
-        queryBuilder: (query) => query.where('isCompleted', isNotEqualTo: true),
-      );
 }

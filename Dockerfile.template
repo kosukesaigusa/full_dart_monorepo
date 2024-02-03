@@ -4,7 +4,7 @@ FROM dart:stable AS build
 
 # Copy server source codes.
 WORKDIR /app
-COPY common /app/common
+# COPY common /app/common
 COPY server /app/server
 
 # Resolve app dependencies.
