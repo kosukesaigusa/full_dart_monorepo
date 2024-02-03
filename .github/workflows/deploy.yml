@@ -79,7 +79,8 @@ jobs:
 
       - name: Create Eventarc Trigger
         run: |
-          if gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }}; then
+          if ! gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }}; then
+            echo "Trigger does not exist. Creating trigger."
             gcloud eventarc triggers create ${{ matrix.service }} \
               --location=${{ env.REGION }} \
               --destination-run-service=${{ matrix.service }} \
