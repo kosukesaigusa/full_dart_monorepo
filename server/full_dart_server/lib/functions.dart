@@ -27,11 +27,8 @@ Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
   await documentSnapshot.ref.update({
     'title': '$title from server!',
   });
-  context.logger.debug(jsonEncode(event.toJson()));
-  context.logger.debug(jsonEncode(context.request.headers));
-  context.logger.debug(jsonEncode(context.request.url));
-  context.logger.debug(jsonEncode(context.request.requestedUri));
+  stdout.writeln(jsonEncode(event.toJson()));
+  stdout.writeln(jsonEncode(context.request.headers));
+  stdout.writeln(jsonEncode(context.responseHeaders));
   context.logger.debug(jsonEncode(context.request.method));
-  context.logger.debug(jsonEncode(context.request.handlerPath));
-  context.logger.debug(jsonEncode(context.responseHeaders));
 }
