@@ -19,15 +19,19 @@ jobs:
       matrix:
         include:
           - service: oncreatetodo
+            signature_type: cloudevent
             event_type: google.cloud.firestore.document.v1.created
             path_pattern: document=todos/{todoId}
           - service: onupdatetodo
+            signature_type: cloudevent
             event_type: google.cloud.firestore.document.v1.updated
             path_pattern: document=todos/{todoId}
           - service: ondeletetodo
+            signature_type: cloudevent
             event_type: google.cloud.firestore.document.v1.deleted
             path_pattern: document=todos/{todoId}
           - service: onwritetodo
+            signature_type: cloudevent
             event_type: google.cloud.firestore.document.v1.written
             path_pattern: document=todos/{todoId}
 
@@ -39,12 +43,6 @@ jobs:
         uses: 'dart-lang/setup-dart@v1'
         with:
           sdk: stable
-
-      - name: Generate Dockerfile
-        run: |
-          rm -f Dockerfile
-          sed "s/TARGET_PLACEHOLDER/${{ matrix.service }}/" Dockerfile.template > Dockerfile
-          cat Dockerfile
 
       - name: Google Auth
         id: auth
@@ -62,6 +60,14 @@ jobs:
           dart pub get
           dart pub run build_runner build --delete-conflicting-outputs
         working-directory: server/full_dart_server
+
+      - name: Generate Dockerfile
+        run: |
+          rm -f Dockerfile
+          sed -e "s/TARGET_PLACEHOLDER/${{ matrix.service }}/" \
+              -e "s/SIGNATURE_TYPE_PLACEHOLDER/${{ matrix.signature_type }}/" \
+              Dockerfile.template > Dockerfile
+          cat Dockerfile
 
       - name: Deploy to Cloud Run
         id: deploy

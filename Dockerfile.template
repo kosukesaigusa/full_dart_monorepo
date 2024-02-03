@@ -23,4 +23,4 @@ COPY --from=build /app/server/full_dart_server/bin/server /app/server/full_dart_
 
 # Start server.
 EXPOSE 8080
-ENTRYPOINT ["/app/server/full_dart_server/bin/server", "--target=TARGET_PLACEHOLDER", "--signature-type=cloudevent"]
+ENTRYPOINT ["/app/server/full_dart_server/bin/server", "--target=TARGET_PLACEHOLDER", "--signature-type=SIGNATURE_TYPE_PLACEHOLDER"]
