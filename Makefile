@@ -37,7 +37,7 @@ deploy: build
 # https://cloud.google.com/sdk/gcloud/reference/eventarc/triggers/create
 # https://cloud.google.com/eventarc/docs/run/route-trigger-eventarc
 # https://cloud.google.com/eventarc/docs/run/route-trigger-cloud-firestore
-trigger:
+deploy-trigger:
 	gcloud eventarc triggers create $(FUNCTION_TARGET) \
     --location=$(REGION) \
     --destination-run-service=$(FUNCTION_TARGET) \
@@ -48,3 +48,6 @@ trigger:
     --event-data-content-type="application/protobuf" \
     --service-account="$(EVENT_ARC_SERVICE_ACCOUNT_NAME)@$(PROJECT_ID).iam.gserviceaccount.com" \
 		--project=$(PROJECT_ID)
+
+check-trigger:
+	gcloud eventarc triggers describe $(FUNCTION_TARGET) --location=$(REGION) --project=$(PROJECT_ID)
