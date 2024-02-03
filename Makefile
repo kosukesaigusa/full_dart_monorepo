@@ -21,8 +21,6 @@ clean:
 run: build
 	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
 
-
-
 # See: https://cloud.google.com/sdk/gcloud/reference/run/deploy
 deploy: build
 	gcloud run deploy $(FUNCTION_TARGET) \
