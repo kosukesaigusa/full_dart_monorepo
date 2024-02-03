@@ -36,6 +36,7 @@ deploy: build
 # See: 
 # https://cloud.google.com/sdk/gcloud/reference/eventarc/triggers/create
 # https://cloud.google.com/eventarc/docs/run/route-trigger-eventarc
+# https://cloud.google.com/eventarc/docs/run/route-trigger-cloud-firestore
 trigger:
 	gcloud eventarc triggers create $(FUNCTION_TARGET) \
     --location=$(REGION) \
