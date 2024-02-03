@@ -15,8 +15,21 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        service: [oncreatetodo, onupdatetodo, ondeletetodo, onwritetodo]
+        include:
+          - service: oncreatetodo
+            event_type: google.cloud.firestore.document.v1.created
+            path_pattern: document=todos/{todoId}
+          - service: onupdatetodo
+            event_type: google.cloud.firestore.document.v1.updated
+            path_pattern: document=todos/{todoId}
+          - service: ondeletetodo
+            event_type: google.cloud.firestore.document.v1.deleted
+            path_pattern: document=todos/{todoId}
+          - service: onwritetodo
+            event_type: google.cloud.firestore.document.v1.written
+            path_pattern: document=todos/{todoId}
 
     steps:
       - name: Checkout
@@ -37,9 +50,12 @@ jobs:
         id: auth
         uses: 'google-github-actions/auth@v2'
         with:
-          project_id: '${{ secrets.PROJECT_ID }}'
-          workload_identity_provider: '${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}'
-          service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+          project_id: ${{ secrets.PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: Build
         run: |
@@ -52,7 +68,7 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           source: ./
-          service: ${{ matrix.SERVICE }}
+          service: ${{ matrix.service }}
           region: ${{ env.REGION }}
           env_vars: ENVIRONMENT=production
           secrets: |
@@ -60,3 +76,20 @@ jobs:
             CLIENT_ID=CLIENT_ID:latest
             CLIENT_EMAIL=CLIENT_EMAIL:latest
             PRIVATE_KEY=PRIVATE_KEY:latest
+
+      - name: Create Eventarc Trigger
+        run: |
+          if gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }}; then
+            gcloud eventarc triggers create ${{ matrix.service }} \
+              --location=${{ env.REGION }} \
+              --destination-run-service=${{ matrix.service }} \
+              --event-filters="type=${{ matrix.event_type }}" \
+              --event-filters="database=(default)" \
+              --event-filters="namespace=(default)" \
+              --event-filters-path-pattern="document=${{ matrix.path_pattern }}" \
+              --event-data-content-type="application/protobuf" \
+              --service-account="${{ secrets.EVENTARC_SERVICE_ACCOUNT }}" \
+              --project=${{ secrets.PROJECT_ID }}
+          else
+            echo "Trigger already exists. Skipping creation."
+          fi
