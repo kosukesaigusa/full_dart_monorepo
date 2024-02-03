@@ -22,7 +22,7 @@ run: build
 	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
 
 # See: https://cloud.google.com/sdk/gcloud/reference/run/deploy
-deploy: build
+deploy-function: build
 	gcloud run deploy $(FUNCTION_TARGET) \
 		--source=. \
 		--no-allow-unauthenticated \
