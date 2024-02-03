@@ -2,23 +2,24 @@ include secrets.mk
 
 .PHONY: clean
 
+SERVER_DIR = server/full_dart_server
 FUNCTION_TARGET = oncreatetodo
 REGION = asia-northeast1
 FUNCTION_SIGNATURE_TYPE = cloudevent
 
 server_build:
-	cd server/full_dart_server && dart run build_runner build --delete-conflicting-outputs
+	cd $(SERVER_DIR) && dart run build_runner build --delete-conflicting-outputs
 
 build: server_build
 
 test: clean build
-	cd server/full_dart_server && dart test
+	cd $(SERVER_DIR) && dart test
 
 clean:
-	cd server/full_dart_server && dart run build_runner clean
+	cd $(SERVER_DIR) && dart run build_runner clean
 
 run: build
-	cd server/full_dart_server && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
+	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
 
 
 
