@@ -8,6 +8,7 @@ import 'config.dart';
 
 @CloudFunction()
 Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
+  context.logger.debug('oncreatetodo function triggered');
   context.logger.debug(jsonEncode(event.toJson()));
   context.logger.debug(jsonEncode(context.request.headers));
   context.logger.debug(jsonEncode(context.request.url));
