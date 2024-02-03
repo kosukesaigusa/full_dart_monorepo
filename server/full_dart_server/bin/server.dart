@@ -24,5 +24,14 @@ FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
       'oncreatetodo' => FunctionTarget.cloudEventWithContext(
           function_library.oncreatetodo,
         ),
+      'onupdatetodo' => FunctionTarget.cloudEventWithContext(
+          function_library.onupdatetodo,
+        ),
+      'ondeletetodo' => FunctionTarget.cloudEventWithContext(
+          function_library.ondeletetodo,
+        ),
+      'onwritetodo' => FunctionTarget.cloudEventWithContext(
+          function_library.onwritetodo,
+        ),
       _ => null
     };
