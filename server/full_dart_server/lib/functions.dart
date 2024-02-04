@@ -15,15 +15,17 @@ Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
   stdout.writeln('json: ${jsonEncode(json)}');
 
+  final createdDocument = CreatedDocument.fromCloudEvent(
+    firestore: firestore,
+    event: event,
+  );
+
   final documentId = documentIdFromCloudEvent(event);
-  final title = (((json['value'] as Map<String, dynamic>)['fields']
-      as Map?)?['title'] as Map?)?['stringValue'] as String?;
+  final title = createdDocument.data['title'] as String?;
 
   final documentSnapshot =
       await firestore.collection('todos').doc(documentId).get();
-  await documentSnapshot.ref.update({
-    'title': '$title from server!',
-  });
+  await documentSnapshot.ref.update({'title': '$title from server!'});
   context.logger.debug('subject: ${subjectFromCloudEvent(event)}');
   context.logger.debug('event.data: ${event.data}');
   stdout.writeln('event.toJson(): ${jsonEncode(event.toJson())}');
