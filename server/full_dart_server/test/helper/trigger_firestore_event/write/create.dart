@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  test('trigger google.cloud.firestore.document.v1.created event', () async {
+  test('trigger google.cloud.firestore.document.v1.written (create)', () async {
     await http.post(
       Uri.parse('http://localhost:8080/'),
-      body: _protobufBytesWhenCreatingDocument,
+      body: _protobufBytesWhenCreatingOnWrittenDocument,
       headers: {
         'ce-dataschema':
             'https://github.com/googleapis/google-cloudevents/blob/main/proto/google/events/cloud/firestore/v1/data.proto',
@@ -18,16 +18,16 @@ void main() {
         'ce-subject': 'documents/todos/6iGrCr5nJar6NNB8gPog',
         'ce-namespace': '(default)',
         'x-forwarded-proto': 'https',
-        'forwarded': 'for="107.178.225.35";proto=https',
+        'forwarded': 'for="107.178.225.100";proto=https',
         'traceparent':
-            '00-246376030dd51a2396a5d5a8c104daa3-b253e6d5cf6141b1-01',
+            '00-e53f6320575827f190fe08fdfc50fbe6-c4592404c29e9956-01',
         'content-length': '454',
         'ce-source':
             '//firestore.googleapis.com/projects/full-dart-monorepo/databases/(default)',
         'ce-id': 'ed62685e-31ff-4c92-b60d-b0b8bd889dff',
-        'ce-type': 'google.cloud.firestore.document.v1.created',
+        'ce-type': 'google.cloud.firestore.document.v1.written',
         'x-cloud-trace-context':
-            '246376030dd51a2396a5d5a8c104daa3/12849867967799837105;o=1',
+            'e53f6320575827f190fe08fdfc50fbe6/14148379307224766806;o=1',
         'user-agent':
             'APIs-Google; (+https://developers.google.com/webmasters/APIs-Google.html)',
         'ce-time': '2024-02-03T10:58:22.147439Z',
@@ -37,8 +37,8 @@ void main() {
         'accept': 'application/json',
         'ce-location': 'asia-northeast1',
         'ce-specversion': '1.0',
-        'host': 'oncreatetodo-cwi73pbowq-an.a.run.app',
-        'x-forwarded-for': '107.178.225.35',
+        'host': 'onwritetodo-cwi73pbowq-an.a.run.app',
+        'x-forwarded-for': '107.178.225.100',
         'ce-document': 'todos/6iGrCr5nJar6NNB8gPog',
         'ce-project': 'full-dart-monorepo',
       },
@@ -47,7 +47,7 @@ void main() {
 }
 
 // ignore: unreachable_from_main
-final createDocumentEventData = {
+final createOnWrittenDocumentEventData = {
   'value': {
     'name':
         'projects/full-dart-monorepo/databases/(default)/documents/todos/6iGrCr5nJar6NNB8gPog',
@@ -86,11 +86,11 @@ final createDocumentEventData = {
 };
 
 /// A record in protobuf when creating todo document.
-final _protobufBytesWhenCreatingDocument =
-    Uint8List.fromList(_bytesWhenCreatingDocument);
+final _protobufBytesWhenCreatingOnWrittenDocument =
+    Uint8List.fromList(_bytesWhenCreatingOnWrittenDocument);
 
 /// A record in json when creating todo document.
-final _bytesWhenCreatingDocument = [
+final _bytesWhenCreatingOnWrittenDocument = [
   10,
   195,
   3,

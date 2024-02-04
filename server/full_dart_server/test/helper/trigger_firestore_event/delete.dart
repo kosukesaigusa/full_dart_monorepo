@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 void main() {
-  test('trigger google.cloud.firestore.document.v1.created event', () async {
+  test('trigger google.cloud.firestore.document.v1.deleted event', () async {
     await http.post(
       Uri.parse('http://localhost:8080/'),
-      body: _protobufBytesWhenCreatingDocument,
+      body: _protobufBytesWhenDeletingDocument,
       headers: {
         'ce-dataschema':
             'https://github.com/googleapis/google-cloudevents/blob/main/proto/google/events/cloud/firestore/v1/data.proto',
@@ -18,27 +18,27 @@ void main() {
         'ce-subject': 'documents/todos/6iGrCr5nJar6NNB8gPog',
         'ce-namespace': '(default)',
         'x-forwarded-proto': 'https',
-        'forwarded': 'for="107.178.225.35";proto=https',
+        'forwarded': 'for="107.178.225.99";proto=https',
         'traceparent':
-            '00-246376030dd51a2396a5d5a8c104daa3-b253e6d5cf6141b1-01',
-        'content-length': '454',
+            '00-d2447ce13980f4633c00b01fe695fbb8-89b7c9af80c66f2e-01',
+        'content-length': '485',
         'ce-source':
             '//firestore.googleapis.com/projects/full-dart-monorepo/databases/(default)',
-        'ce-id': 'ed62685e-31ff-4c92-b60d-b0b8bd889dff',
-        'ce-type': 'google.cloud.firestore.document.v1.created',
+        'ce-id': '32c909d5-1241-46b5-8212-b7ead57d2a1b',
+        'ce-type': 'google.cloud.firestore.document.v1.deleted',
         'x-cloud-trace-context':
-            '246376030dd51a2396a5d5a8c104daa3/12849867967799837105;o=1',
+            'd2447ce13980f4633c00b01fe695fbb8/9923622059551125294;o=1',
         'user-agent':
             'APIs-Google; (+https://developers.google.com/webmasters/APIs-Google.html)',
-        'ce-time': '2024-02-03T10:58:22.147439Z',
+        'ce-time': '2024-02-04T04:01:06.318191Z',
         'ce-database': '(default)',
         'content-type': 'application/protobuf',
         'from': 'noreply@google.com',
         'accept': 'application/json',
         'ce-location': 'asia-northeast1',
         'ce-specversion': '1.0',
-        'host': 'oncreatetodo-cwi73pbowq-an.a.run.app',
-        'x-forwarded-for': '107.178.225.35',
+        'host': 'ondeletetodo-cwi73pbowq-an.a.run.app',
+        'x-forwarded-for': '107.178.225.99',
         'ce-document': 'todos/6iGrCr5nJar6NNB8gPog',
         'ce-project': 'full-dart-monorepo',
       },
@@ -47,8 +47,8 @@ void main() {
 }
 
 // ignore: unreachable_from_main
-final createDocumentEventData = {
-  'value': {
+final deleteDocumentEventData = {
+  'oldValue': {
     'name':
         'projects/full-dart-monorepo/databases/(default)/documents/todos/6iGrCr5nJar6NNB8gPog',
     'fields': {
@@ -79,20 +79,21 @@ final createDocumentEventData = {
       'nullField': {'nullValue': 'NULL_VALUE'},
       'timestampField': {'timestampValue': '2024-02-03T03:34:56.720Z'},
       'stringField': {'stringValue': 'a'},
+      'title': {'stringValue': 'null from server!'},
     },
     'createTime': '2024-02-03T10:58:22.147439Z',
-    'updateTime': '2024-02-03T10:58:22.147439Z',
+    'updateTime': '2024-02-03T10:58:24.036383Z',
   },
 };
 
-/// A record in protobuf when creating todo document.
-final _protobufBytesWhenCreatingDocument =
-    Uint8List.fromList(_bytesWhenCreatingDocument);
+/// A record in protobuf when deleting todo document.
+final _protobufBytesWhenDeletingDocument =
+    Uint8List.fromList(_bytesWhenDeletingDocument);
 
-/// A record in json when creating todo document.
-final _bytesWhenCreatingDocument = [
-  10,
-  195,
+/// A record in json when deleting todo document.
+final _bytesWhenDeletingDocument = [
+  18,
+  226,
   3,
   10,
   84,
@@ -519,6 +520,37 @@ final _bytesWhenCreatingDocument = [
   1,
   1,
   97,
+  18,
+  29,
+  10,
+  5,
+  116,
+  105,
+  116,
+  108,
+  101,
+  18,
+  20,
+  138,
+  1,
+  17,
+  110,
+  117,
+  108,
+  108,
+  32,
+  102,
+  114,
+  111,
+  109,
+  32,
+  115,
+  101,
+  114,
+  118,
+  101,
+  114,
+  33,
   26,
   11,
   8,
@@ -535,14 +567,14 @@ final _bytesWhenCreatingDocument = [
   34,
   11,
   8,
-  206,
+  208,
   184,
   248,
   173,
   6,
   16,
   152,
-  251,
-  166,
-  70,
+  210,
+  172,
+  17,
 ];
