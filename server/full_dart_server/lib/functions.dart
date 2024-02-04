@@ -10,22 +10,23 @@ import 'utils/parser.dart';
 @CloudFunction()
 Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
   context.logger.debug('oncreatetodo function is triggered');
+  final createdDocument = CreatedDocument.fromCloudEvent(
+    firestore: firestore,
+    event: event,
+  );
+  final documentId = documentIdFromCloudEvent(event);
+  final eventType = createdDocument.eventType;
+
   final documentEventData =
       DocumentEventData.fromBuffer(event.data! as List<int>);
   final json = documentEventData.toProto3Json()! as Map<String, dynamic>;
   stdout.writeln('json: ${jsonEncode(json)}');
 
-  final createdDocument = CreatedDocument.fromCloudEvent(
-    firestore: firestore,
-    event: event,
-  );
-
-  final documentId = documentIdFromCloudEvent(event);
   final title = createdDocument.data['title'] as String?;
-
   final documentSnapshot =
       await firestore.collection('todos').doc(documentId).get();
   await documentSnapshot.ref.update({'title': '$title from server!'});
+  context.logger.debug('eventType: $eventType');
   context.logger.debug('subject: ${subjectFromCloudEvent(event)}');
   context.logger.debug('event.data: ${event.data}');
   stdout.writeln('event.toJson(): ${jsonEncode(event.toJson())}');
