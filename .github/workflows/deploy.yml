@@ -28,3 +28,4 @@ jobs:
     uses: ./.github/workflows/reusable_deploy_workflow.yml
     with:
       matrix: ${{ needs.set_matrix.outputs.matrix }}
+    secrets: inherit
