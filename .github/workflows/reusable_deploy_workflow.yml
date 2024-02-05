@@ -108,9 +108,7 @@ jobs:
 
       - name: List and cleanup services
         run: |
-          json=$(cat .github/actions/services.yml | ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
-          services=$(echo $json | ruby -rjson -e 'services = JSON.parse(STDIN.read).map { |item| item["service"] }; puts services.join(",")')
-
+          services=$(echo '${{ inputs.services }}' | ruby -rjson -e 'JSON.parse(STDIN.read)["include"].map { |s| s["service"] }.join(" ")')
           deployed_services=$(gcloud run services list --platform managed --region ${{ env.REGION }} --project ${{ secrets.PROJECT_ID }} --format="value(name)")
 
           services_to_delete=()
