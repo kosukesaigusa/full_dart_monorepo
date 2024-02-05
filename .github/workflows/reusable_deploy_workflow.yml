@@ -85,3 +85,53 @@ jobs:
           else
             echo "Trigger already exists. Skipping creation."
           fi
+
+  cleanup:
+    needs: deploy
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: List and cleanup services
+        run: |
+          json=$(cat .github/actions/services.yml | ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
+          services=$(echo $json | ruby -rjson -e 'services = JSON.parse(STDIN.read).map { |item| item["service"] }; puts services.join(",")')
+
+          deployed_services=$(gcloud run services list --platform managed --region ${{ env.REGION }} --project ${{ secrets.PROJECT_ID }} --format="value(name)")
+
+          services_to_delete=()
+          for service in $deployed_services; do
+            if [[ ! $services_to_keep =~ $service ]]; then
+              services_to_delete+=($service)
+            fi
+          done
+
+          if [ ${#services_to_delete[@]} -eq 0 ]; then
+            echo "No services to delete."
+          else
+            echo "Services to delete: ${services_to_delete[@]}"
+
+          for service in $deployed_services; do
+            if [[ ! $services_to_keep =~ $service ]]; then
+              echo "Deleting service: $service"
+              gcloud run services delete $service \
+                --platform managed \
+                --region ${{ env.REGION }} \
+                --project ${{ secrets.PROJECT_ID }} \
+                --quiet
+            fi
+          done
