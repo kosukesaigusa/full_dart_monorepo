@@ -4,29 +4,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  set_matrix:
+  set_services:
     runs-on: ubuntu-latest
 
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      services: ${{ steps.set-services.outputs.services }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set matrix
-        id: set-matrix
+      - name: Set services
+        id: set-services
         # json=$(yq eval -o=json .github/actions/services.yml)
         run: |
-          json=$(cat ${{ github.workspace }}/.github/actions/services.yml| ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
+          json=$(cat ${{ github.workspace }}/.github/actions/services.yml | ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
           echo $json
-          echo "matrix=${json}" >> $GITHUB_OUTPUT
+          echo "services=${json}" >> $GITHUB_OUTPUT
 
   call_reusable_deploy_workflow:
+    needs: set_services
+    uses: ./.github/workflows/reusable_deploy_workflow.yml
+    secrets: inherit
     permissions:
       contents: 'read'
       id-token: 'write'
-    needs: set_matrix
-    uses: ./.github/workflows/reusable_deploy_workflow.yml
     with:
-      matrix: ${{ needs.set_matrix.outputs.matrix }}
-    secrets: inherit
+      services: ${{ needs.set_services.outputs.services }}

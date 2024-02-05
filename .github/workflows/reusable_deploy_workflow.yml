@@ -3,7 +3,7 @@ name: Cloud Run Deployment
 on:
   workflow_call:
     inputs:
-      matrix:
+      services:
         required: true
         type: string
 
@@ -12,15 +12,12 @@ env:
 
 jobs:
   deploy:
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(inputs.matrix) }}
+      matrix:
+        include: ${{ fromJSON(inputs.services) }}
 
     steps:
       - name: Checkout
