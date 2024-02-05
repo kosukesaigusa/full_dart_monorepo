@@ -13,13 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install yq
-        run: sudo snap install yq
-
       - name: Set matrix
         id: set-matrix
+        # json=$(yq eval -o=json .github/actions/services.yml)
         run: |
-          json=$(yq eval -o=json .github/actions/services.yml)
+          json=$(cat ${{ github.workspace }}/.github/actions/services.yml| ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
           echo $json
           echo "matrix=${json}" >> $GITHUB_OUTPUT
 
