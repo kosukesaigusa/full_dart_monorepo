@@ -31,7 +31,21 @@ deploy-function: build
 		--set-env-vars=ENVIRONMENT=production \
 		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest
 
-# See: 
+# https://cloud.google.com/sdk/gcloud/reference/run/services/list
+list-services:
+	gcloud run services list \
+		--platform managed \
+		--region=$(REGION) \
+		--project=$(PROJECT_ID)
+
+# https://cloud.google.com/sdk/gcloud/reference/run/services/delete
+delete-service:
+	gcloud run services delete $(FUNCTION_TARGET) \
+		--platform managed \
+		--region=$(REGION) \
+		--project=$(PROJECT_ID) \
+		--quiet
+
 # https://cloud.google.com/sdk/gcloud/reference/eventarc/triggers/create
 # https://cloud.google.com/eventarc/docs/run/route-trigger-eventarc
 # https://cloud.google.com/eventarc/docs/run/route-trigger-cloud-firestore
@@ -47,5 +61,17 @@ deploy-trigger:
     --service-account="$(EVENT_ARC_SERVICE_ACCOUNT_NAME)@$(PROJECT_ID).iam.gserviceaccount.com" \
 		--project=$(PROJECT_ID)
 
+# https://cloud.google.com/sdk/gcloud/reference/eventarc/triggers/describe
 check-trigger:
-	gcloud eventarc triggers describe $(FUNCTION_TARGET) --location=$(REGION) --project=$(PROJECT_ID)
+	gcloud eventarc triggers describe $(FUNCTION_TARGET) \
+		--location=$(REGION) \
+		--project=$(PROJECT_ID)
+
+# https://cloud.google.com/sdk/gcloud/reference/eventarc/triggers/delete
+delete-trigger:
+	gcloud eventarc triggers delete $(FUNCTION_TARGET) \
+		--location=$(REGION) \
+		--project=$(PROJECT_ID)
+		--quiet
+
+delete: delete-trigger delete-service
