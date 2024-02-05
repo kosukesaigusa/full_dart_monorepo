@@ -21,7 +21,9 @@ jobs:
           echo "matrix=${json}" >> $GITHUB_OUTPUT
 
   call_reusable_deploy_workflow:
-    name: Call Reusable Cloud Run Deployment
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     needs: set_matrix
     uses: ./.github/workflows/reusable_deploy_workflow.yml
     with:
