@@ -11,6 +11,24 @@ env:
   REGION: asia-northeast1
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.PROJECT_ID }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
   # deploy:
   #   runs-on: ubuntu-latest
 
@@ -87,24 +105,24 @@ jobs:
   #         fi
 
   cleanup:
-    # needs: deploy
+    needs: setup
 
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: 'actions/checkout@v4'
+      # - name: Checkout
+      #   uses: 'actions/checkout@v4'
 
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: ${{ secrets.PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      # - name: Google Auth
+      #   id: auth
+      #   uses: 'google-github-actions/auth@v2'
+      #   with:
+      #     project_id: ${{ secrets.PROJECT_ID }}
+      #     workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+      #     service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
+      # - name: Set up Cloud SDK
+      #   uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: List and cleanup services
         run: |
