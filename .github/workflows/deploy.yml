@@ -3,9 +3,6 @@ name: 🚚 Deploy to Cloud Run
 on:
   workflow_dispatch:
 
-env:
-  REGION: asia-northeast1
-
 jobs:
   set_matrix:
     runs-on: ubuntu-latest
@@ -15,9 +12,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - id: set-matrix
+
+      - name: Install yq
+        run: sudo snap install yq
+
+      - name: Set matrix
+        id: set-matrix
         run: |
-          json=$(cat ${{ github.workspace }}/.github/actions/services.yml| ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
+          json=$(yq eval -o=json .github/actions/services.yml)
+          echo $json
           echo "matrix=${json}" >> $GITHUB_OUTPUT
 
   call_reusable_deploy_workflow:
