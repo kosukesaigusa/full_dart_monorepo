@@ -106,7 +106,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      - name: List and cleanup services
+      - name: Cleanup Services
         run: |
           services=$(echo '${{ inputs.services }}' | ruby -rjson -e 'puts JSON.parse(STDIN.read).map { |s| s["service"] }.join(" ")')
           deployed_services=$(gcloud run services list --platform managed --region ${{ env.REGION }} --project ${{ secrets.PROJECT_ID }} --format="value(name)")

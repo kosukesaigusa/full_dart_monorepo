@@ -15,13 +15,17 @@ jobs:
 
       - name: Set services
         id: set-services
-        # json=$(yq eval -o=json .github/actions/services.yml)
         run: |
           json=$(cat ${{ github.workspace }}/.github/actions/services.yml | ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
           echo $json
           echo "services=${json}" >> $GITHUB_OUTPUT
+        # Equivalent to:
+        # run: |
+        #   json=$(yq eval -o=json .github/actions/services.yml)
+        #   echo $json
+        #   echo "services=${json}" >> $GITHUB_OUTPUT
 
-  call_reusable_deploy_workflow:
+  call_workflow:
     needs: set_services
     uses: ./.github/workflows/reusable_deploy_workflow.yml
     secrets: inherit
