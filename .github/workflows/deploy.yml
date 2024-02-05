@@ -119,7 +119,7 @@ jobs:
               --platform=managed \
               --region=${{ env.REGION }} \
               --format="value(name)" \
-              --project=${{ env.PROJECT_ID }} | 
+              --project=${{ secrets.PROJECT_ID }} | 
             grep -v -E "$(echo $services_to_keep | sed 's/ /|/g')"
           )
           echo "Services to delete: $services_to_delete"
@@ -128,7 +128,7 @@ jobs:
             | xargs -n 1 gcloud run services delete \
               --platform=managed \
               --region=${{ env.REGION }} \
-              --project=${{ env.PROJECT_ID }} \
+              --project=${{ secrets.PROJECT_ID }} \
               --quiet 
           else
             echo "No services to delete."
