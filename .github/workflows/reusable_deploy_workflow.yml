@@ -113,7 +113,7 @@ jobs:
 
           services_to_delete=()
           for service in $deployed_services; do
-            if [[ ! $services_to_keep =~ $service ]]; then
+            if [[ ! $services =~ $service ]]; then
               services_to_delete+=($service)
             fi
           done
@@ -122,14 +122,12 @@ jobs:
             echo "No services to delete."
           else
             echo "Services to delete: ${services_to_delete[@]}"
-
-          for service in $deployed_services; do
-            if [[ ! $services_to_keep =~ $service ]]; then
+            for service in "${services_to_delete[@]}"; do
               echo "Deleting service: $service"
               gcloud run services delete $service \
                 --platform managed \
                 --region ${{ env.REGION }} \
                 --project ${{ secrets.PROJECT_ID }} \
                 --quiet
-            fi
-          done
+            done
+          fi
