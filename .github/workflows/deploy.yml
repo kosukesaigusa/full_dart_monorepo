@@ -101,3 +101,35 @@ jobs:
           else
             echo "Trigger already exists. Skipping creation."
           fi
+
+      - name: Save deployed services names
+        run: echo "${{ matrix.service }}" >> ${{ github.workspace }}/deployed-services.txt
+
+  cleanup:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: List all services
+        id: list_services
+        run: |
+          echo "Deployed services:" $(cat ${{ github.workspace }}/deployed-services.txt)
+          services_to_keep=$(cat ${{ github.workspace }}/deployed-services.txt | tr '\n' ' ')
+          services_to_delete=$(
+            gcloud run services list \
+              --platform=managed \
+              --region=${{ env.REGION }} \
+              --format="value(name)" \
+              --project=${{ env.PROJECT_ID }} | 
+            grep -v -E "$(echo $services_to_keep | sed 's/ /|/g')"
+          )
+          echo "Services to delete: $services_to_delete"
+          if [ -n "$services_to_delete" ]; then
+            echo "$services_to_delete" \
+            | xargs -n 1 gcloud run services delete \
+              --platform=managed \
+              --region=${{ env.REGION }} \
+              --project=${{ env.PROJECT_ID }} \
+              --quiet 
+          else
+            echo "No services to delete."
+          fi
