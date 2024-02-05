@@ -7,129 +7,22 @@ env:
   REGION: asia-northeast1
 
 jobs:
-  deploy:
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
+  set_matrix:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - service: oncreatetodo
-            signature_type: cloudevent
-            event_type: google.cloud.firestore.document.v1.created
-            path_pattern: document=todos/{todoId}
-          - service: onupdatetodo
-            signature_type: cloudevent
-            event_type: google.cloud.firestore.document.v1.updated
-            path_pattern: document=todos/{todoId}
-          - service: ondeletetodo
-            signature_type: cloudevent
-            event_type: google.cloud.firestore.document.v1.deleted
-            path_pattern: document=todos/{todoId}
-          - service: onwritetodo
-            signature_type: cloudevent
-            event_type: google.cloud.firestore.document.v1.written
-            path_pattern: document=todos/{todoId}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
     steps:
-      - name: Checkout
-        uses: 'actions/checkout@v4'
-
-      - name: Set up Dart
-        uses: 'dart-lang/setup-dart@v1'
-        with:
-          sdk: stable
-
-      - name: Google Auth
-        id: auth
-        uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: ${{ secrets.PROJECT_ID }}
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
-
-      - name: Set up Cloud SDK
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      - name: Build
+      - uses: actions/checkout@v4
+      - id: set-matrix
         run: |
-          dart pub get
-          dart pub run build_runner build --delete-conflicting-outputs
-        working-directory: server/full_dart_server
+          json=$(cat ${{ github.workspace }}/.github/actions/services.yml| ruby -ryaml -rjson -e 'puts YAML.load(STDIN).to_json')
+          echo "matrix=${json}" >> $GITHUB_OUTPUT
 
-      - name: Generate Dockerfile
-        run: |
-          rm -f Dockerfile
-          sed -e "s/TARGET_PLACEHOLDER/${{ matrix.service }}/" \
-              -e "s/SIGNATURE_TYPE_PLACEHOLDER/${{ matrix.signature_type }}/" \
-              Dockerfile.template > Dockerfile
-          cat Dockerfile
-
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: 'google-github-actions/deploy-cloudrun@v2'
-        with:
-          source: ./
-          service: ${{ matrix.service }}
-          region: ${{ env.REGION }}
-          env_vars: ENVIRONMENT=production
-          secrets: |
-            PROJECT_ID=PROJECT_ID:latest
-            CLIENT_ID=CLIENT_ID:latest
-            CLIENT_EMAIL=CLIENT_EMAIL:latest
-            PRIVATE_KEY=PRIVATE_KEY:latest
-
-      - name: Create Eventarc Trigger
-        if: ${{ matrix.signature_type == 'cloudevent' }}
-        run: |
-          if ! gcloud eventarc triggers describe ${{ matrix.service }} --location=${{ env.REGION }} --project=${{ secrets.PROJECT_ID }} > /dev/null 2>&1; then
-            echo "Trigger does not exist. Creating trigger."
-            gcloud eventarc triggers create ${{ matrix.service }} \
-              --location=${{ env.REGION }} \
-              --destination-run-service=${{ matrix.service }} \
-              --event-filters="type=${{ matrix.event_type }}" \
-              --event-filters="database=(default)" \
-              --event-filters="namespace=(default)" \
-              --event-filters-path-pattern="${{ matrix.path_pattern }}" \
-              --event-data-content-type="application/protobuf" \
-              --service-account="${{ secrets.EVENTARC_SERVICE_ACCOUNT }}" \
-              --project=${{ secrets.PROJECT_ID }}
-          else
-            echo "Trigger already exists. Skipping creation."
-          fi
-
-      - name: Save deployed services names
-        run: echo "${{ matrix.service }}" >> ${{ github.workspace }}/deployed-services.txt
-
-  cleanup:
-    needs: deploy
-    runs-on: ubuntu-latest
-    steps:
-      - name: List all services
-        id: list_services
-        run: |
-          echo "Deployed services:" $(cat ${{ github.workspace }}/deployed-services.txt)
-          services_to_keep=$(cat ${{ github.workspace }}/deployed-services.txt | tr '\n' ' ')
-          services_to_delete=$(
-            gcloud run services list \
-              --platform=managed \
-              --region=${{ env.REGION }} \
-              --format="value(name)" \
-              --project=${{ secrets.PROJECT_ID }} | 
-            grep -v -E "$(echo $services_to_keep | sed 's/ /|/g')"
-          )
-          echo "Services to delete: $services_to_delete"
-          if [ -n "$services_to_delete" ]; then
-            echo "$services_to_delete" \
-            | xargs -n 1 gcloud run services delete \
-              --platform=managed \
-              --region=${{ env.REGION }} \
-              --project=${{ secrets.PROJECT_ID }} \
-              --quiet 
-          else
-            echo "No services to delete."
-          fi
+  call_reusable_deploy_workflow:
+    name: Call Reusable Cloud Run Deployment
+    needs: set_matrix
+    uses: ./.github/workflows/reusable_deploy_workflow.yml
+    with:
+      matrix: ${{ needs.set_matrix.outputs.matrix }}
