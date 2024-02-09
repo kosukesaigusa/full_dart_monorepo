@@ -42,8 +42,6 @@ class CreateFirebaseAuthCustomTokenFunction {
         'imageUrl': profile.imageUrl,
       });
 
-      print('customToken: $customToken');
-
       return Response.ok(jsonEncode({'customToken': customToken}));
     } on Exception catch (e) {
       return Response.badRequest(body: jsonEncode({'message': e.toString()}));
