@@ -1,17 +1,20 @@
+import 'package:dart_firebase_admin/auth.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
 
 import 'environment_variable.dart';
 
-final _environmentVariable = EnvironmentVariable(EnvironmentProvider());
+final environmentVariable = EnvironmentVariable(EnvironmentProvider());
 
 final _adminApp = FirebaseAdminApp.initializeApp(
-  _environmentVariable.projectId,
+  environmentVariable.projectId,
   Credential.fromServiceAccountParams(
-    clientId: _environmentVariable.clientId,
-    privateKey: _environmentVariable.privateKey,
-    email: _environmentVariable.clientEmail,
+    clientId: environmentVariable.clientId,
+    privateKey: environmentVariable.privateKey,
+    email: environmentVariable.clientEmail,
   ),
 );
 
 final firestore = Firestore(_adminApp);
+
+final auth = Auth(_adminApp);

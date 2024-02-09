@@ -25,6 +25,9 @@ class EnvironmentVariable {
   String get clientEmail => _provider.getEnvironmentVariable('CLIENT_EMAIL');
 
   String get privateKey => _provider.getEnvironmentVariable('PRIVATE_KEY');
+
+  String get lineChannelId =>
+      _provider.getEnvironmentVariable('LINE_CHANNEL_ID');
 }
 
 enum Environment {

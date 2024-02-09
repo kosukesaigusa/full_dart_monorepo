@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:functions_framework/functions_framework.dart';
+import 'package:shelf/shelf.dart';
 
 import 'config.dart';
+import 'functions/create_firebase_auth_custom_token.dart';
 import 'utils/parser.dart';
 
 @CloudFunction()
@@ -78,3 +80,11 @@ Future<void> onwritetodo(CloudEvent event, RequestContext context) async {
   );
   stdout.writeln('event.data: ${event.data}');
 }
+
+@CloudFunction()
+Future<Response> createfirebaseauthcustomtoken(Request request) =>
+    CreateFirebaseAuthCustomTokenFunction(
+      firestore: firestore,
+      auth: auth,
+      request: request,
+    ).call();

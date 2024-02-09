@@ -1,0 +1,90 @@
+import 'dart:convert';
+
+import 'package:dart_firebase_admin/auth.dart';
+import 'package:dart_firebase_admin/firestore.dart';
+import 'package:http/http.dart' as http;
+import 'package:shelf/shelf.dart';
+
+import '../config.dart';
+
+class CreateFirebaseAuthCustomTokenFunction {
+  const CreateFirebaseAuthCustomTokenFunction({
+    required this.firestore,
+    required this.auth,
+    required this.request,
+  });
+
+  final Firestore firestore;
+
+  final Auth auth;
+
+  final Request request;
+
+  Future<Response> call() async {
+    try {
+      final json =
+          jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+      final accessToken = json['accessToken'] as String?;
+      if (accessToken == null) {
+        return Response.badRequest(
+          body: jsonEncode({'message': 'accessToken is required.'}),
+        );
+      }
+
+      await _verifyAccessToken(accessToken);
+
+      final profile = await _getLineProfile(accessToken);
+
+      final customToken = await auth.createCustomToken(profile.lineUserId);
+
+      await firestore.collection('users').doc(profile.lineUserId).set({
+        'displayName': profile.displayName,
+        'imageUrl': profile.imageUrl,
+      });
+
+      print('customToken: $customToken');
+
+      return Response.ok(jsonEncode({'customToken': customToken}));
+    } on Exception catch (e) {
+      return Response.badRequest(body: jsonEncode({'message': e.toString()}));
+    }
+  }
+
+  Future<void> _verifyAccessToken(String accessToken) async {
+    final response = await http.get(
+      Uri.parse(
+        'https://api.line.me/oauth2/v2.1/verify?access_token=$accessToken',
+      ),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed in verifying access token.');
+    }
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    final channelId = json['client_id'] as String;
+    final expiresIn = json['expires_in'] as int;
+
+    if (channelId != environmentVariable.lineChannelId) {
+      throw Exception('LINE Login channel ID is not correct.');
+    }
+    if (expiresIn <= 0) {
+      throw Exception('Access toke is expired.');
+    }
+  }
+
+  Future<({String lineUserId, String displayName, String? imageUrl})>
+      _getLineProfile(String accessToken) async {
+    final response = await http.get(
+      Uri.parse('https://api.line.me/v2/profile'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed in getting LINE profile by access token.');
+    }
+    final json = jsonDecode(response.body) as Map<String, dynamic>;
+    return (
+      lineUserId: json['userId'] as String,
+      displayName: json['displayName'] as String,
+      imageUrl: json['pictureUrl'] as String?,
+    );
+  }
+}
