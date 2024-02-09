@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: dart_firebase_admin
+dependency_overrides:
+  dart_firebase_admin:
+    path: ..
