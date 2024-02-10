@@ -25,11 +25,22 @@ run: build
 deploy-function: build
 	gcloud run deploy $(FUNCTION_TARGET) \
 		--source=. \
-		--no-allow-unauthenticated \
-		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
+		--project=$(PROJECT_ID) \
+		--no-allow-unauthenticated \
 		--set-env-vars=ENVIRONMENT=production \
-		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest
+		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest,LINE_CHANNEL_ID=LINE_CHANNEL_ID:latest \
+		--quiet
+
+deploy-unauthenticated-function: build
+	gcloud run deploy $(FUNCTION_TARGET) \
+		--source=. \
+		--region=$(REGION) \
+		--project=$(PROJECT_ID) \
+		--allow-unauthenticated \
+		--set-env-vars=ENVIRONMENT=production \
+		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest,LINE_CHANNEL_ID=LINE_CHANNEL_ID:latest \
+		--quiet
 
 # https://cloud.google.com/sdk/gcloud/reference/run/services/list
 list-services:
