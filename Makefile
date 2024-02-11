@@ -21,7 +21,7 @@ clean:
 	cd $(SERVER_DIR) && dart run build_runner clean
 
 run: build
-	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
+	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=$(FUNCTION_SIGNATURE_TYPE)
 
 # https://cloud.google.com/sdk/gcloud/reference/run/deploy
 # https://cloud.google.com/functions/docs/configuring/max-instances
