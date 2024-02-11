@@ -53,13 +53,13 @@ jobs:
               Dockerfile.template > Dockerfile
           cat Dockerfile
 
-      - name: Set allow-unauthenticated if needed
+      - name: Set flags
         run: |
+          FLAGS="--max-instances=1 --memory=256Mi"
           if [ "${{ matrix.signature_type }}" == "http" ]; then
-            echo "flags=--allow-unauthenticated" >> $GITHUB_ENV
-          else
-            echo "flags=" >> $GITHUB_ENV
+            FLAGS="$FLAGS --allow-unauthenticated"
           fi
+          echo "FLAGS=$FLAGS" >> $GITHUB_ENV
 
       # https://github.com/google-github-actions/deploy-cloudrun
       # https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions
