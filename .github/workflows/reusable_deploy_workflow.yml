@@ -70,7 +70,6 @@ jobs:
           source: ./
           service: ${{ matrix.service }}
           region: ${{ env.REGION }}
-          skip_default_labels: true
           flags: ${{ env.flags }}
           env_vars: ENVIRONMENT=production
           secrets: |
