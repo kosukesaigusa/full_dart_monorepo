@@ -6,6 +6,8 @@ SERVER_DIR = server/full_dart_server
 FUNCTION_TARGET = oncreatetodo
 REGION = asia-northeast1
 FUNCTION_SIGNATURE_TYPE = cloudevent
+MAX_INSTANCE_LIMIT = 1
+MEMORY_LIMIT = 256Mi
 
 server_build:
 	cd $(SERVER_DIR) && dart run build_runner build --delete-conflicting-outputs
@@ -21,15 +23,17 @@ clean:
 run: build
 	cd $(SERVER_DIR) && dart run bin/server.dart --target=$(FUNCTION_TARGET) --signature-type=cloudevent
 
-# See: https://cloud.google.com/sdk/gcloud/reference/run/deploy
+# https://cloud.google.com/sdk/gcloud/reference/run/deploy
+# https://cloud.google.com/functions/docs/configuring/max-instances
+# https://cloud.google.com/functions/docs/configuring/memory
 deploy-function: build
 	gcloud run deploy $(FUNCTION_TARGET) \
 		--source=. \
 		--region=$(REGION) \
 		--project=$(PROJECT_ID) \
 		--no-allow-unauthenticated \
-		--max-instances=1 \
-		--memory=256Mi \
+		--max-instances $(MAX_INSTANCE_LIMIT) \
+		--memory=$(MEMORY_LIMIT) \
 		--set-env-vars=ENVIRONMENT=production \
 		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest,LINE_CHANNEL_ID=LINE_CHANNEL_ID:latest \
 		--quiet
@@ -40,8 +44,8 @@ deploy-unauthenticated-function: build
 		--region=$(REGION) \
 		--project=$(PROJECT_ID) \
 		--allow-unauthenticated \
-		--max-instances=1 \
-		-memory=256Mi \
+		--max-instances $(MAX_INSTANCE_LIMIT) \
+		--memory=$(MEMORY_LIMIT) \
 		--set-env-vars=ENVIRONMENT=production \
 		--set-secrets=PROJECT_ID=PROJECT_ID:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_EMAIL=CLIENT_EMAIL:latest,PRIVATE_KEY=PRIVATE_KEY:latest,LINE_CHANNEL_ID=LINE_CHANNEL_ID:latest \
 		--quiet

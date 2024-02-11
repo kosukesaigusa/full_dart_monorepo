@@ -9,6 +9,8 @@ on:
 
 env:
   REGION: asia-northeast1
+  MAX_INSTANCE_LIMIT: 1
+  MEMORY_LIMIT: 256Mi
 
 jobs:
   deploy:
@@ -55,7 +57,7 @@ jobs:
 
       - name: Set flags
         run: |
-          FLAGS="--max-instances=1 --memory=256Mi"
+          FLAGS="--max-instances ${{ env.MAX_INSTANCE_LIMIT }} --memory=${{ env.MEMORY_LIMIT }}"
           if [ "${{ matrix.signature_type }}" == "http" ]; then
             FLAGS="$FLAGS --allow-unauthenticated"
           fi
