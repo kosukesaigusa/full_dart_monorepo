@@ -54,9 +54,12 @@ jobs:
           cat Dockerfile
 
       - name: Set allow-unauthenticated if needed
-        id: set-flags
-        run: echo "::set-output name=flags::--allow-unauthenticated"
-        if: ${{ matrix.signature_type == 'http' }}
+        run: |
+          if [ "${{ matrix.signature_type }}" == "http" ]; then
+            echo "flags=--allow-unauthenticated" >> $GITHUB_ENV
+          else
+            echo "flags=" >> $GITHUB_ENV
+          fi
 
       # https://github.com/google-github-actions/deploy-cloudrun
       # https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions
@@ -68,7 +71,7 @@ jobs:
           service: ${{ matrix.service }}
           region: ${{ env.REGION }}
           skip_default_labels: true
-          flags: ${{ steps.set-flags.outputs.flags }}
+          flags: ${{ env.flags }}
           env_vars: ENVIRONMENT=production
           secrets: |
             PROJECT_ID=PROJECT_ID:latest
