@@ -45,3 +45,6 @@ app.*.map.json
 
 # Makefile secrets
 secrets.mk
+
+# HTTP request file
+test.http
