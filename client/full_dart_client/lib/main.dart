@@ -6,7 +6,7 @@ import 'package:flutter_line_sdk/flutter_line_sdk.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'firebase_options.dart';
-import 'todo_list.dart';
+import 'submission_list.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ void main() async {
     ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const TodoListPage(),
+        home: const SubmissionListPage(),
         scrollBehavior: const MaterialScrollBehavior().copyWith(
           dragDevices: {
             PointerDeviceKind.mouse,
