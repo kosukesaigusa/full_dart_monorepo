@@ -1,6 +1,7 @@
 import 'package:dart_firebase_admin/auth.dart';
 import 'package:dart_firebase_admin/dart_firebase_admin.dart';
 import 'package:dart_firebase_admin/firestore.dart';
+import 'package:dart_firebase_admin/messaging.dart';
 
 import 'test_environment_variable.dart';
 
@@ -18,3 +19,5 @@ final _adminApp = FirebaseAdminApp.initializeApp(
 final firestore = Firestore(_adminApp);
 
 final auth = Auth(_adminApp);
+
+final messaging = Messaging(_adminApp);

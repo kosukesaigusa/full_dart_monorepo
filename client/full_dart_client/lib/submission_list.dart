@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -127,6 +128,14 @@ class _SubmissionListPageState extends ConsumerState<SubmissionListPage> {
           floatingActionButton: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              FloatingActionButton(
+                onPressed: () async {
+                  final token = await FirebaseMessaging.instance.getToken();
+                  print('token: $token');
+                },
+                child: const Icon(Icons.notification_important_rounded),
+              ),
+              const SizedBox(height: 4),
               FloatingActionButton(
                 onPressed: () => ref.read(submissionQueryProvider).add(
                       createSubmissionData: CreateSubmissionData(
