@@ -1,85 +1,48 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:functions_framework/functions_framework.dart';
 import 'package:shelf/shelf.dart';
 
 import 'config.dart';
 import 'functions/create_firebase_auth_custom_token.dart';
-import 'utils/parser.dart';
+import 'functions/on_create_todo.dart';
+import 'functions/on_delete_todo.dart';
+import 'functions/on_update_todo.dart';
+import 'functions/on_write_todo.dart';
 
 @CloudFunction()
-Future<void> oncreatetodo(CloudEvent event, RequestContext context) async {
-  final documentCreatedEvent = DocumentCreatedEvent.fromCloudEvent(
-    firestore: firestore,
-    event: event,
-  );
-  final documentId = documentCreatedEvent.id;
-  final eventType = documentCreatedEvent.eventType;
-
-  final title = documentCreatedEvent.value.data['title'] as String?;
-  final documentSnapshot =
-      await firestore.collection('todos').doc(documentId).get();
-  await documentSnapshot.ref.update({'title': '$title from server!'});
-
-  context.logger.debug('documentId: $documentId');
-  context.logger.debug('eventType: $eventType');
-  stdout.writeln(
-    'context.request.headers ${jsonEncode(context.request.headers)}',
-  );
-  stdout.writeln('event.data: ${event.data}');
-}
+Future<void> oncreatetodo(CloudEvent event, RequestContext context) =>
+    OnCreateTodoFunction(
+      firestore: firestore,
+      auth: auth,
+      event: event,
+      context: context,
+    ).call();
 
 @CloudFunction()
-Future<void> onupdatetodo(CloudEvent event, RequestContext context) async {
-  final documentUpdatedEvent = DocumentUpdatedEvent.fromCloudEvent(
-    firestore: firestore,
-    event: event,
-  );
-  final documentId = documentUpdatedEvent.id;
-  final eventType = documentUpdatedEvent.eventType;
-
-  context.logger.debug('documentId: $documentId');
-  context.logger.debug('eventType: $eventType');
-  stdout.writeln(
-    'context.request.headers ${jsonEncode(context.request.headers)}',
-  );
-  stdout.writeln('event.data: ${event.data}');
-}
+Future<void> onupdatetodo(CloudEvent event, RequestContext context) =>
+    OnUpdateTodoFunction(
+      firestore: firestore,
+      auth: auth,
+      event: event,
+      context: context,
+    ).call();
 
 @CloudFunction()
-Future<void> ondeletetodo(CloudEvent event, RequestContext context) async {
-  final documentDeletedEvent = DocumentDeletedEvent.fromCloudEvent(
-    firestore: firestore,
-    event: event,
-  );
-  final documentId = documentDeletedEvent.id;
-  final eventType = documentDeletedEvent.eventType;
-
-  context.logger.debug('documentId: $documentId');
-  context.logger.debug('eventType: $eventType');
-  stdout.writeln(
-    'context.request.headers ${jsonEncode(context.request.headers)}',
-  );
-  stdout.writeln('event.data: ${event.data}');
-}
+Future<void> ondeletetodo(CloudEvent event, RequestContext context) =>
+    OnDeleteTodoFunction(
+      firestore: firestore,
+      auth: auth,
+      event: event,
+      context: context,
+    ).call();
 
 @CloudFunction()
-Future<void> onwritetodo(CloudEvent event, RequestContext context) async {
-  final documentWrittenEvent = DocumentWrittenEvent.fromCloudEvent(
-    firestore: firestore,
-    event: event,
-  );
-  final documentId = documentWrittenEvent.id;
-  final eventType = documentWrittenEvent.eventType;
-
-  context.logger.debug('documentId: $documentId');
-  context.logger.debug('eventType: $eventType');
-  stdout.writeln(
-    'context.request.headers ${jsonEncode(context.request.headers)}',
-  );
-  stdout.writeln('event.data: ${event.data}');
-}
+Future<void> onwritetodo(CloudEvent event, RequestContext context) =>
+    OnWriteTodoFunction(
+      firestore: firestore,
+      auth: auth,
+      event: event,
+      context: context,
+    ).call();
 
 @CloudFunction()
 Future<Response> createfirebaseauthcustomtoken(Request request) =>
