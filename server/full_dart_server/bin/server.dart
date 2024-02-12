@@ -33,6 +33,9 @@ FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
       'onwritetodo' => FunctionTarget.cloudEventWithContext(
           function_library.onwritetodo,
         ),
+      'oncreatesubmission' => FunctionTarget.cloudEventWithContext(
+          function_library.oncreatesubmission,
+        ),
       'createfirebaseauthcustomtoken' => FunctionTarget.http(
           function_library.createfirebaseauthcustomtoken,
         ),

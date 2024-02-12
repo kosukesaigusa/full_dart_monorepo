@@ -3,6 +3,7 @@ import 'package:shelf/shelf.dart';
 
 import 'config.dart';
 import 'functions/create_firebase_auth_custom_token.dart';
+import 'functions/on_create_submission.dart';
 import 'functions/on_create_todo.dart';
 import 'functions/on_delete_todo.dart';
 import 'functions/on_update_todo.dart';
@@ -38,6 +39,15 @@ Future<void> ondeletetodo(CloudEvent event, RequestContext context) =>
 @CloudFunction()
 Future<void> onwritetodo(CloudEvent event, RequestContext context) =>
     OnWriteTodoFunction(
+      firestore: firestore,
+      auth: auth,
+      event: event,
+      context: context,
+    ).call();
+
+@CloudFunction()
+Future<void> oncreatesubmission(CloudEvent event, RequestContext context) =>
+    OnCreateSubmissionFunction(
       firestore: firestore,
       auth: auth,
       event: event,
