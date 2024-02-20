@@ -62,6 +62,7 @@ jobs:
             FLAGS="$FLAGS --allow-unauthenticated"
           fi
           echo "FLAGS=$FLAGS" >> $GITHUB_ENV
+          echo $GITHUB_ENV
 
       # https://github.com/google-github-actions/deploy-cloudrun
       # https://cloud.google.com/blog/products/devops-sre/deploy-to-cloud-run-with-github-actions
@@ -72,7 +73,7 @@ jobs:
           source: ./
           service: ${{ matrix.service }}
           region: ${{ env.REGION }}
-          flags: ${{ env.flags }}
+          flags: ${{ env.FLAGS }}
           env_vars: ENVIRONMENT=production
           secrets: |
             PROJECT_ID=PROJECT_ID:latest
