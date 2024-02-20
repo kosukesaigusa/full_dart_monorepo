@@ -48,3 +48,7 @@ secrets.mk
 
 # HTTP request file
 test.http
+
+# Dart & Flutter SDK
+.dvm
+.fvm
