@@ -10,6 +10,9 @@ import 'functions/on_update_todo.dart';
 import 'functions/on_write_todo.dart';
 
 @CloudFunction()
+Response hello(Request request) => Response.ok('Hello, World!');
+
+@CloudFunction()
 Future<void> oncreatetodo(CloudEvent event, RequestContext context) =>
     OnCreateTodoFunction(
       firestore: firestore,

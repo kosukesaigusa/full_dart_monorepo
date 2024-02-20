@@ -21,6 +21,9 @@ Future<void> main(List<String> args) async {
 }
 
 FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
+      'hello' => FunctionTarget.http(
+          function_library.hello,
+        ),
       'oncreatetodo' => FunctionTarget.cloudEventWithContext(
           function_library.oncreatetodo,
         ),
