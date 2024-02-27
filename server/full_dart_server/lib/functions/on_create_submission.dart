@@ -20,6 +20,10 @@ class OnCreateSubmissionFunction {
 
   final RequestContext context;
 
+  /// Called when a new document is created in the `submissions` collection.
+  ///
+  /// If the document contains a non-null `submittedByUserId`, update the
+  /// `isVerified` field of the document to `true`.
   Future<void> call() async {
     final documentCreatedEvent = DocumentCreatedEvent.fromCloudEvent(
       firestore: firestore,

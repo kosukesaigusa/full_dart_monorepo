@@ -20,6 +20,14 @@ class CreateFirebaseAuthCustomTokenFunction {
 
   final Request request;
 
+  /// Links Firebase Auth and LINE Login with custom token authentication.
+  ///
+  /// Verify the `accessToken` obtained from the request body of [request] with
+  /// the [_verifyAccessToken] method, and get the LINE profile with the
+  /// [_getLineProfile] method.
+  ///
+  /// Then, create a custom token from the LINE user ID in Firebase Auth, save
+  /// the profile information in Firestore, and return the custom token.
   Future<Response> call() async {
     try {
       final json =
