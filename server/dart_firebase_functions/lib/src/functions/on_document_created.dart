@@ -1,49 +1,28 @@
 // NOTE: https://github.com/firebase/firebase-functions/pull/1370
 
-/// published annotation
-class OnDocumentCreated {
-  const OnDocumentCreated(this.document);
+import 'package:functions_framework/functions_framework.dart';
 
-  final String document;
-}
-
-/// QueryDocumentSnapshot
-class QueryDocumentSnapshot {
-  const QueryDocumentSnapshot();
-}
+import 'firebase_functions.dart';
 
 // **************************************************************************
 // Generated codes
 // **************************************************************************
 
-class OnSubmissionDocumentCreatedEvent {
-  const OnSubmissionDocumentCreatedEvent({
-    required this.params,
-    required this.data,
-  });
-
-  final OnSubmissionDocumentCreatedEventParams params;
-
-  final QueryDocumentSnapshot? data;
-}
-
-class OnSubmissionDocumentCreatedEventParams {
-  String get submissionId => 'some-submissionId';
-}
-
 class OnTodoDocumentCreatedEvent {
-  const OnTodoDocumentCreatedEvent({
+  factory OnTodoDocumentCreatedEvent.fromCloudEvent(CloudEvent event) {
+    final path = subjectPathFromCloudEvent(event);
+    const params = (todoId: '');
+    final snapshot = QueryDocumentSnapshotBuilder().build(event);
+    return OnTodoDocumentCreatedEvent._(params: params, data: snapshot);
+  }
+  const OnTodoDocumentCreatedEvent._({
     required this.params,
     required this.data,
   });
 
-  final OnTodoDocumentCreatedEventParams params;
+  final ({String todoId}) params;
 
   final QueryDocumentSnapshot? data;
-}
-
-class OnTodoDocumentCreatedEventParams {
-  String get todoId => 'some-todoId';
 }
 
 class OnLogDocumentTodosCollectionCreatedEvent {
@@ -52,15 +31,9 @@ class OnLogDocumentTodosCollectionCreatedEvent {
     required this.data,
   });
 
-  final OnLogDocumentTodosCollectionCreatedEventParams params;
+  final ({String todoId, String logId}) params;
 
   final QueryDocumentSnapshot? data;
-}
-
-class OnLogDocumentTodosCollectionCreatedEventParams {
-  String get todoId => 'some-todoId';
-
-  String get logId => 'some-logId';
 }
 
 class OnFooDocumentLogsCollectionTodosCollectionCreatedEvent {
@@ -69,15 +42,7 @@ class OnFooDocumentLogsCollectionTodosCollectionCreatedEvent {
     required this.data,
   });
 
-  final OnFooDocumentLogsCollectionTodosCollectionCreatedEventParams params;
+  final ({String todoId, String logId, String fooId}) params;
 
   final QueryDocumentSnapshot? data;
-}
-
-class OnFooDocumentLogsCollectionTodosCollectionCreatedEventParams {
-  String get todoId => 'some-todoId';
-
-  String get logId => 'some-logId';
-
-  String get fooId => 'some-fooId';
 }

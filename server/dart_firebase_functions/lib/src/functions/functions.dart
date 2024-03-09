@@ -1,4 +1,12 @@
+import 'package:dart_firebase_admin/dart_firebase_admin.dart';
+
+import 'annotations.dart';
 import 'on_document_created.dart';
+
+FirebaseAdminApp initializeAdminApp() => FirebaseAdminApp.initializeApp(
+      'project-id',
+      throw UnimplementedError(),
+    );
 
 @OnDocumentCreated('todos/{todoId}')
 Future<void> onCreateTodo(OnTodoDocumentCreatedEvent event) async {
