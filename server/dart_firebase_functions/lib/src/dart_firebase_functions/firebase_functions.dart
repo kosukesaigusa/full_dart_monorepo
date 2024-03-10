@@ -78,17 +78,99 @@ class QueryDocumentSnapshot {
 }
 
 class QueryDocumentSnapshotBuilder {
-  QueryDocumentSnapshot build(CloudEvent event) {
+  QueryDocumentSnapshot onCreated(CloudEvent event) {
     final documentEventData =
         proto.DocumentEventData.fromBuffer(event.data! as List<int>);
-    final document = documentEventData.value;
+    final path = subjectPathFromCloudEvent(event);
+    final value = documentEventData.value;
     return QueryDocumentSnapshot._(
-      ref: FirebaseFunctions.firestore.doc(subjectPathFromCloudEvent(event)),
+      ref: FirebaseFunctions.firestore.doc(path),
       createTime:
-          admin_firestore.Timestamp.fromDate(document.createTime.toDateTime()),
+          admin_firestore.Timestamp.fromDate(value.createTime.toDateTime()),
       updateTime:
-          admin_firestore.Timestamp.fromDate(document.updateTime.toDateTime()),
-      document: document,
+          admin_firestore.Timestamp.fromDate(value.updateTime.toDateTime()),
+      document: value,
+    );
+  }
+
+  ({
+    QueryDocumentSnapshot before,
+    QueryDocumentSnapshot after,
+  }) onUpdated(CloudEvent event) {
+    final documentEventData =
+        proto.DocumentEventData.fromBuffer(event.data! as List<int>);
+    final path = subjectPathFromCloudEvent(event);
+    final value = documentEventData.value;
+    final oldValue = documentEventData.oldValue;
+    return (
+      before: QueryDocumentSnapshot._(
+        ref: FirebaseFunctions.firestore.doc(path),
+        createTime: admin_firestore.Timestamp.fromDate(
+          oldValue.createTime.toDateTime(),
+        ),
+        updateTime: admin_firestore.Timestamp.fromDate(
+          oldValue.updateTime.toDateTime(),
+        ),
+        document: oldValue,
+      ),
+      after: QueryDocumentSnapshot._(
+        ref: FirebaseFunctions.firestore.doc(path),
+        createTime: admin_firestore.Timestamp.fromDate(
+          value.createTime.toDateTime(),
+        ),
+        updateTime: admin_firestore.Timestamp.fromDate(
+          value.updateTime.toDateTime(),
+        ),
+        document: value,
+      )
+    );
+  }
+
+  QueryDocumentSnapshot onDeleted(CloudEvent event) {
+    final documentEventData =
+        proto.DocumentEventData.fromBuffer(event.data! as List<int>);
+    final path = subjectPathFromCloudEvent(event);
+    final oldValue = documentEventData.oldValue;
+    return QueryDocumentSnapshot._(
+      ref: FirebaseFunctions.firestore.doc(path),
+      createTime:
+          admin_firestore.Timestamp.fromDate(oldValue.createTime.toDateTime()),
+      updateTime:
+          admin_firestore.Timestamp.fromDate(oldValue.updateTime.toDateTime()),
+      document: oldValue,
+    );
+  }
+
+  ({
+    QueryDocumentSnapshot before,
+    QueryDocumentSnapshot after,
+  }) onWritten(CloudEvent event) {
+    final documentEventData =
+        proto.DocumentEventData.fromBuffer(event.data! as List<int>);
+    final path = subjectPathFromCloudEvent(event);
+    final value = documentEventData.value;
+    final oldValue = documentEventData.oldValue;
+    return (
+      before: QueryDocumentSnapshot._(
+        ref: FirebaseFunctions.firestore.doc(path),
+        createTime: admin_firestore.Timestamp.fromDate(
+          oldValue.createTime.toDateTime(),
+        ),
+        updateTime: admin_firestore.Timestamp.fromDate(
+          oldValue.updateTime.toDateTime(),
+        ),
+        document: oldValue,
+      ),
+      after: QueryDocumentSnapshot._(
+        ref: FirebaseFunctions.firestore.doc(path),
+        createTime: admin_firestore.Timestamp.fromDate(
+          value.createTime.toDateTime(),
+        ),
+        updateTime: admin_firestore.Timestamp.fromDate(
+          value.updateTime.toDateTime(),
+        ),
+        document: value,
+      )
     );
   }
 }

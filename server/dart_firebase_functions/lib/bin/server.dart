@@ -13,11 +13,21 @@ Future<void> main(List<String> args) async {
 FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
       'oncreatetodo' => FunctionTarget.cloudEvent(
           (event) {
-            final documentIds = FirestorePathParser('todos/{todoId}')
-                .parse(event.toJson()['subject'] as String);
+            final documentIds =
+                FirestorePathParser('todos/{todoId}').parse(event.subject!);
             return function_library.onCreateTodo(
               (todoId: documentIds['todoId']!),
-              QueryDocumentSnapshotBuilder().build(event),
+              QueryDocumentSnapshotBuilder().onCreated(event),
+            );
+          },
+        ),
+      'onupdatetodo' => FunctionTarget.cloudEvent(
+          (event) {
+            final documentIds =
+                FirestorePathParser('todos/{todoId}').parse(event.subject!);
+            return function_library.onUpdateTodo(
+              (todoId: documentIds['todoId']!),
+              QueryDocumentSnapshotBuilder().onUpdated(event),
             );
           },
         ),
