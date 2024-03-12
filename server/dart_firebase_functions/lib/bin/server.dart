@@ -13,22 +13,22 @@ Future<void> main(List<String> args) async {
 FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
       'oncreatetodo' => FunctionTarget.cloudEvent(
           (event) {
+            const document = 'todos/{todoId}';
             final documentIds =
-                FirestorePathParser('todos/{todoId}').parse(event.subject!);
-            return function_library.onCreateTodo(
-              (todoId: documentIds['todoId']!),
-              QueryDocumentSnapshotBuilder().onCreated(event),
-            );
+                FirestorePathParser(document).parse(event.subject!);
+            final data = QueryDocumentSnapshotBuilder(event).fromCloudEvent();
+            return function_library
+                .onCreateTodo((todoId: documentIds['todoId']!), data.snapshot);
           },
         ),
       'onupdatetodo' => FunctionTarget.cloudEvent(
           (event) {
+            const document = 'todos/{todoId}';
             final documentIds =
-                FirestorePathParser('todos/{todoId}').parse(event.subject!);
-            return function_library.onUpdateTodo(
-              (todoId: documentIds['todoId']!),
-              QueryDocumentSnapshotBuilder().onUpdated(event),
-            );
+                FirestorePathParser(document).parse(event.subject!);
+            final data = QueryDocumentSnapshotBuilder(event).fromCloudEvent();
+            return function_library
+                .onUpdateTodo((todoId: documentIds['todoId']!), data.change);
           },
         ),
       _ => null

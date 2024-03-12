@@ -18,10 +18,7 @@ Future<void> onCreateTodo(
 }
 
 @OnDocumentUpdated('todos/{todoId}')
-Future<void> onUpdateTodo(
-  ({String todoId}) params,
-  ({QueryDocumentSnapshot before, QueryDocumentSnapshot after}) snapshot,
-) async {
+Future<void> onUpdateTodo(({String todoId}) params, Change snapshot) async {
   final todoId = params.todoId;
   final before = snapshot.before.data();
   final after = snapshot.after.data();
