@@ -5,42 +5,46 @@ import 'dart_firebase_functions/firebase_functions.dart';
 
 FirebaseAdminApp initializeAdminApp() => FirebaseAdminApp.initializeApp(
       'project-id',
-      throw UnimplementedError(),
+      Credential.fromServiceAccountParams(
+        clientId: 'client-id',
+        privateKey: 'private-key',
+        email: 'email',
+      ),
     );
 
 @OnDocumentCreated('todos/{todoId}')
-Future<void> onCreateTodo(
+Future<void> oncreatetodo(
   ({String todoId}) params,
-  QueryDocumentSnapshot snapshot,
+  QueryDocumentSnapshot data,
 ) async {
   final todoId = params.todoId;
-  final data = snapshot.data();
+  final snapshot = data;
 }
 
 @OnDocumentUpdated('todos/{todoId}')
-Future<void> onUpdateTodo(({String todoId}) params, Change snapshot) async {
+Future<void> onupdatetodo(({String todoId}) params, Change data) async {
   final todoId = params.todoId;
-  final before = snapshot.before.data();
-  final after = snapshot.after.data();
+  final before = data.before;
+  final after = data.after;
 }
 
 @OnDocumentCreated('todos/{todoId}/logs/{logId}')
-Future<void> onCreateLog(
+Future<void> oncreatelog(
   ({String todoId, String logId}) params,
-  QueryDocumentSnapshot snapshot,
+  QueryDocumentSnapshot data,
 ) async {
   final todoId = params.todoId;
   final logId = params.logId;
-  final data = snapshot.data();
+  final snapshot = data;
 }
 
 @OnDocumentCreated('todos/{todoId}/logs/{logId}/foos/{fooId}')
-Future<void> onCreateFoo(
+Future<void> oncreatefoo(
   ({String todoId, String logId, String fooId}) params,
-  QueryDocumentSnapshot snapshot,
+  QueryDocumentSnapshot data,
 ) async {
   final todoId = params.todoId;
   final logId = params.logId;
   final fooId = params.fooId;
-  final data = snapshot.data();
+  final snapshot = data;
 }

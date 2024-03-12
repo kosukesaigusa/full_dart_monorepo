@@ -18,7 +18,7 @@ FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
                 FirestorePathParser(document).parse(event.subject!);
             final data = QueryDocumentSnapshotBuilder(event).fromCloudEvent();
             return function_library
-                .onCreateTodo((todoId: documentIds['todoId']!), data.snapshot);
+                .oncreatetodo((todoId: documentIds['todoId']!), data.snapshot);
           },
         ),
       'onupdatetodo' => FunctionTarget.cloudEvent(
@@ -28,7 +28,7 @@ FunctionTarget? _nameToFunctionTarget(String name) => switch (name) {
                 FirestorePathParser(document).parse(event.subject!);
             final data = QueryDocumentSnapshotBuilder(event).fromCloudEvent();
             return function_library
-                .onUpdateTodo((todoId: documentIds['todoId']!), data.change);
+                .onupdatetodo((todoId: documentIds['todoId']!), data.change);
           },
         ),
       _ => null
